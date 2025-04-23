@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Contact Submissions{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="mb-4">Contact Form Submissions</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        {% if contacts %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                        <th>Date Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                        <tr>
+                            <td>{{ contact.id }}</td>
+                            <td>{{ contact.name }}</td>
+                            <td>{{ contact.email }}</td>
+                            <td>{{ contact.message }}</td>
+                            <td>{{ contact.date_submitted.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info">No contact form submissions yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
