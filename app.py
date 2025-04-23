@@ -60,6 +60,24 @@ def view_contacts():
     contacts = Contact.query.order_by(Contact.date_submitted.desc()).all()
     return render_template('admin_contacts.html', contacts=contacts)
 
+# Add a search feature to admin page
+@app.route('/admin/search')
+def search_contacts():
+    query = request.args.get('q', '')
+    if query:
+        # Search in name, email, and message
+        contacts = Contact.query.filter(
+            db.or_(
+                Contact.name.contains(query),
+                Contact.email.contains(query),
+                Contact.message.contains(query)
+            )
+        ).order_by(Contact.date_submitted.desc()).all()
+    else:
+        contacts = []
+    
+    return render_template('search_contacts.html', contacts=contacts, query=query)
+
 # Create database tables before running the app
 # The following code works with all Flask versions
 with app.app_context():
