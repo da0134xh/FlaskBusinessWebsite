@@ -19,3 +19,10 @@ If you want to export your database data to review it more easily:
 # Export to a file .output contacts.csv SELECT * FROM contact; .output stdout 
 # Exit SQLite .exit 
 # View the exported file cat contacts.csv
+
+To Run Application
+1. python -m venv venv
+2. source venv/bin/activate
+3. pip install flask
+4. pip install flask-sqlalchemy
+5. python app.py
