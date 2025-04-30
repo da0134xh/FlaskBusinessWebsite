@@ -1,9 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_wtf import FlaskForm
+from wtforms import FileField, SubmitField
+from werkzeug.utils import secure_filename
+import os
+from wtforms.validators import InputRequired
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for flashing messages
+app.config['UPLOAD_FOLDER'] = 'static/files'
+
 
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///business_site.db'
@@ -20,10 +27,26 @@ class Contact(db.Model):
     
     def __repr__(self):
         return f'<Contact {self.name}>'
+    
+# Upload photo class
+class UploadFileForm(FlaskForm):
+    file = FileField("File", validators=[InputRequired()])
+    submit = SubmitField("Upload File")
 
 @app.route('/')
 def home():
     return render_template('home.html')
+
+# Upload photo method
+@app.route('/uploadphoto', methods=['GET','POST'])
+def uploadphoto():
+    form = UploadFileForm()
+    if form.validate_on_submit():
+        file = form.file.data # Grabs file from form
+        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename))) # Then save the file
+        return "File has been uploaded."
+    return render_template('upload.html', form=form)
+
 
 @app.route('/about')
 def about():
