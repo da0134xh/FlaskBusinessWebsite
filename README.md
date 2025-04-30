@@ -25,4 +25,5 @@ To Run Application
 2. source venv/bin/activate
 3. pip install flask
 4. pip install flask-sqlalchemy
-5. python app.py
+5. pip install flask-wtf
+6. python app.py
