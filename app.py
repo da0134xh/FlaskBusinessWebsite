@@ -6,11 +6,16 @@ from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
 import os
 from wtforms.validators import InputRequired
+from sqlalchemy import or_
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for flashing messages
 app.config['UPLOAD_FOLDER'] = 'static/files'
+app.config['WTF_CSRF_ENABLED'] = True  # Ensure CSRF protection for Flask-WTF
 
+# Create upload folder if it doesn't exist
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///business_site.db'
@@ -42,9 +47,11 @@ def home():
 def uploadphoto():
     form = UploadFileForm()
     if form.validate_on_submit():
-        file = form.file.data # Grabs file from form
-        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename))) # Then save the file
-        return "File has been uploaded."
+        file = form.file.data  # Grabs file from form
+        filename = secure_filename(file.filename)  # Secure filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Save the file
+        flash('File has been uploaded successfully!', 'success')
+        return redirect(url_for('home'))
     return render_template('upload.html', form=form)
 
 
@@ -88,9 +95,8 @@ def view_contacts():
 def search_contacts():
     query = request.args.get('q', '')
     if query:
-        # Search in name, email, and message
         contacts = Contact.query.filter(
-            db.or_(
+            or_(
                 Contact.name.contains(query),
                 Contact.email.contains(query),
                 Contact.message.contains(query)
@@ -102,10 +108,8 @@ def search_contacts():
     return render_template('search_contacts.html', contacts=contacts, query=query)
 
 # Create database tables before running the app
-# The following code works with all Flask versions
 with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
-
