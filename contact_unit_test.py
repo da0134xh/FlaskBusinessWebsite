@@ -1,5 +1,7 @@
+
 import unittest
 from app import app, db, Contact
+from datetime import datetime, timezone
 
 class ContactModelTestCase(unittest.TestCase):
     def setUp(self):
@@ -34,10 +36,15 @@ class ContactModelTestCase(unittest.TestCase):
         self.assertEqual(retrieved_contact.email, 'CarlosTest@example.com')
         self.assertEqual(retrieved_contact.message, 'Hello, this is a test message.')
 
+        # Print all contacts in the database
+        all_contacts = Contact.query.all()
+        for contact in all_contacts:
+            print(contact)
+
     def test_contact_repr(self):
         # Test the __repr__ method
-        contact = Contact(name='Dog Cat', email='DogCat@example.com', message='Another test message.')
-        self.assertEqual(repr(contact), '<Contact Dog Cat>')
+        contact = Contact(name='Cat Dog', email='CatDog@example.com', message='Another test message.')
+        self.assertEqual(repr(contact), '<Contact Cat Dog>')
 
 if __name__ == '__main__':
     unittest.main()
